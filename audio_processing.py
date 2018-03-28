@@ -23,10 +23,4 @@ def get_feature(filename):
                       mel_scale=True)(signal)
     feat = diff_feature(feat, nd=2)
     feat = (feat - np.mean(feat)) / np.std(feat)
-    return signal.shape[0], sample_rate, feat.reshape([-1, 39, 1])
-
-def main():
-    print(get_feature('/home/zinzin/Documents/pytorch/deepspeaker-pytorch/s2_n_8_9.wav')[2].shape)
-
-if __name__ == '__main__':
-    main()
+    return signal.shape[0], sample_rate, feat.reshape([1, 1, -1, 39])
