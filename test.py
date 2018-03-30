@@ -10,10 +10,10 @@ print('Raw input: ', rawInput)
 
 if torch.cuda.is_available():
 	tensor = torch.from_numpy(rawInput).type(torch.FloatTensor).cuda()
-	cnnModel = DeepSpeakerModel(512, 1).cuda()
+	cnnModel = DeepSpeakerModel(256, 1).cuda()
 else:
 	tensor = torch.from_numpy(rawInput).type(torch.FloatTensor)
-	cnnModel = DeepSpeakerModel(512, 1)
+	cnnModel = DeepSpeakerModel(256, 1)
 
 input = Variable(tensor, requires_grad=True)
 

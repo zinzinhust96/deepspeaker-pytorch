@@ -87,14 +87,11 @@ class myResNet(nn.Module):
         self.conv2 = nn.Conv2d(64, 128, kernel_size=5, stride=2, padding=2,bias=False)
         self.bn2 = nn.BatchNorm2d(128)
         self.layer2 = self._make_layer(block, 128, layers[1])
+
         self.inplanes = 256
         self.conv3 = nn.Conv2d(128, 256, kernel_size=5, stride=2, padding=2,bias=False)
         self.bn3 = nn.BatchNorm2d(256)
         self.layer3 = self._make_layer(block, 256, layers[2])
-        self.inplanes = 512
-        self.conv4 = nn.Conv2d(256, 512, kernel_size=5, stride=2, padding=2,bias=False)
-        self.bn4 = nn.BatchNorm2d(512)
-        self.layer4 = self._make_layer(block, 512, layers[3])
 
 		# average sentence
         self.avgpool = nn.AdaptiveAvgPool2d([4,1])
@@ -149,8 +146,8 @@ class DeepSpeakerModel(nn.Module):
 
         self.embedding_size = embedding_size
 
-        self.model = myResNet(BasicBlock, [3, 3, 3, 3])
-        self.model.fc = nn.Linear(512*4, self.embedding_size)
+        self.model = myResNet(BasicBlock, [3, 3, 3])
+        self.model.fc = nn.Linear(512*2, self.embedding_size)
 
         self.model.classifier = nn.Linear(self.embedding_size, num_classes)
 
@@ -170,15 +167,21 @@ class DeepSpeakerModel(nn.Module):
 
     def forward(self, x):
 
+        print('Input: ', x.shape)
+
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
         x = self.model.layer1(x)
 
+        print('After layer 1: ', x.shape)
+
         x = self.model.conv2(x)
         x = self.model.bn2(x)
         x = self.model.relu(x)
         x = self.model.layer2(x)
+
+        print('After layer 2: ', x.shape)
 
         x = self.model.conv3(x)
         x = self.model.bn3(x)
@@ -186,13 +189,6 @@ class DeepSpeakerModel(nn.Module):
         x = self.model.layer3(x)
 
         print('After layer 3: ', x.shape)
-
-        x = self.model.conv4(x)
-        x = self.model.bn4(x)
-        x = self.model.relu(x)
-        x = self.model.layer4(x)
-
-        print('After layer 4: ', x.shape)
 
         # average sentence
         x = self.model.avgpool(x)
