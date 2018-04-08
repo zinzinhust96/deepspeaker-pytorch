@@ -2,3 +2,5 @@
 __pycache__/
 data/
 *.wav
+files.txt
+triplet.txt
