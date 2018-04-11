@@ -19,7 +19,7 @@ def get_wav_files(path):
             for file in files:
                 if file.endswith(".wav"):
                     if (folder in os.path.join(root, file)):
-                        f.append(os.path.join(root, file) + '\n')
+                        f.append(os.path.join(root, file))
         people.append(f)
     return people, classes
 

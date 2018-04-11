@@ -119,7 +119,6 @@ file_loader = read_audio
 
 
 train_dir = DeepSpeakerDataset(path = os.path.dirname(os.path.abspath(__file__)) + '/data/BKRecording',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
-print('TRAIN_DIR: ', train_dir)
 
 #test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
 
@@ -172,6 +171,8 @@ def train(train_loader, model, optimizer, epoch):
     model.train()
 
     labels, distances = [], []
+
+    print('---START TRAINING---')
 
     pbar = tqdm(enumerate(train_loader))
     for batch_idx, (data_a, data_p, data_n,label_p,label_n) in pbar:
