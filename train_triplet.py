@@ -16,8 +16,7 @@ from model import DeepSpeakerModel
 from eval_metrics import evaluate
 from logger import Logger
 
-#from DeepSpeakerDataset_dynamic import DeepSpeakerDataset
-from VoxcelebTestset import VoxcelebTestset
+from DeepSpeakerDataset import DeepSpeakerDataset
 
 from model import PairwiseDistance,TripletMarginLoss
 from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncatedinputfromMFB,read_MFB,read_audio,mk_MFB
@@ -143,7 +142,7 @@ train_dir = DeepSpeakerDataset(voxceleb = voxceleb_dev, dir=args.dataroot,n_trip
 del voxceleb
 del voxceleb_dev
 
-test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
+#test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
 
 #qwer = test_dir.__getitem__(3)
 
