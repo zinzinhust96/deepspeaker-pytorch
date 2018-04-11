@@ -11,7 +11,9 @@ path = os.path.dirname(os.path.abspath(__file__)) + '/data/BKRecording'
 
 def get_wav_files(path):
     people = []
+    classes = []
     for folder in os.listdir(path):
+        classes.append(folder)
         f = []
         for root, dirs, files in os.walk(path):
             for file in files:
@@ -19,7 +21,7 @@ def get_wav_files(path):
                     if (folder in os.path.join(root, file)):
                         f.append(os.path.join(root, file) + '\n')
         people.append(f)
-    return people
+    return people, classes
 
 
 def find_classes(voxceleb):
@@ -70,16 +72,16 @@ class DeepSpeakerDataset(data.Dataset):
 
     def __init__(self, path, n_triplets,loader, transform=None, *arg, **kw):
 
-        classes = get_wav_files(path)
+        people, classes = get_wav_files(path)
         features = []
-        for index, files in enumerate(classes):
+        for index, files in enumerate(people):
             for file in files:
                 tup = (file, index)
                 features.append(tup)
 
         self.root = dir
         #self.features = features
-        # self.classes = classes
+        self.classes = classes
         # self.class_to_idx = class_to_idx
         self.transform = transform
         self.loader = loader

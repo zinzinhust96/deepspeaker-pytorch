@@ -109,38 +109,17 @@ logger = Logger(LOG_DIR)
 kwargs = {'num_workers': 0, 'pin_memory': True} if args.cuda else {}
 l2_dist = PairwiseDistance(2)
 
-
-voxceleb = read_voxceleb_structure(args.dataroot)
-if args.makemfb:
-    #pbar = tqdm(voxceleb)
-    for datum in voxceleb:
-        mk_MFB((args.dataroot +'/voxceleb1_wav/' + datum['filename']+'.wav'))
-    print("Complete convert")
-
-if args.mfb:
-    transform = transforms.Compose([
-        truncatedinputfromMFB(),
-        totensor()
-    ])
-    transform_T = transforms.Compose([
-        truncatedinputfromMFB(input_per_file=args.test_input_per_file),
-        totensor()
-    ])
-    file_loader = read_MFB
-else:
-    transform = transforms.Compose([
-                        truncatedinput(),
-                        toMFB(),
-                        totensor(),
-                        #tonormal()
-                    ])
-    file_loader = read_audio
+transform = transforms.Compose([
+                    truncatedinput(),
+                    toMFB(),
+                    totensor(),
+                    #tonormal()
+                ])
+file_loader = read_audio
 
 
-voxceleb_dev = [datum for datum in voxceleb if datum['subset']=='dev']
-train_dir = DeepSpeakerDataset(voxceleb = voxceleb_dev, dir=args.dataroot,n_triplets=args.n_triplets,loader = file_loader,transform=transform)
-del voxceleb
-del voxceleb_dev
+train_dir = DeepSpeakerDataset(path = os.path.dirname(os.path.abspath(__file__)) + '/data/BKRecording',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
+print('TRAIN_DIR: ', train_dir)
 
 #test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
 
@@ -181,7 +160,6 @@ def main():
     end = start + args.epochs
 
     train_loader = torch.utils.data.DataLoader(train_dir, batch_size=args.batch_size, shuffle=False, **kwargs)
-    test_loader = torch.utils.data.DataLoader(test_dir, batch_size=args.test_batch_size, shuffle=False, **kwargs)
     for epoch in range(start, end):
 
         train(train_loader, model, optimizer, epoch)
