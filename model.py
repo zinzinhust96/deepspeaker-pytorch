@@ -29,7 +29,7 @@ class TripletMarginLoss(Function):
         d_p = self.cos(anchor, positive)
         d_n = self.cos(anchor, negative)
 
-        dist_hinge = torch.clamp(self.margin + d_n - d_p, min=0.0)
+        dist_hinge = torch.clamp(self.margin + d_p - d_n, min=0.0)
         loss = torch.mean(dist_hinge)
         return loss
 

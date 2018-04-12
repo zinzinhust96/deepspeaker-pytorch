@@ -24,11 +24,6 @@ from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncate
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Speaker Recognition')
 # Model options
-parser.add_argument('--dataroot', type=str, default='./voxceleb',
-                    help='path to dataset')
-parser.add_argument('--test-pairs-path', type=str, default='./voxceleb/voxceleb1_test3.txt',
-                    help='path to pairs file')
-
 parser.add_argument('--log-dir', default='./data/pytorch_speaker_logs',
                     help='folder to output model checkpoints')
 
@@ -41,10 +36,10 @@ parser.add_argument('--start-epoch', default=1, type=int, metavar='N',
 parser.add_argument('--epochs', type=int, default=50, metavar='E',
                     help='number of epochs to train (default: 10)')
 # Training options
-parser.add_argument('--embedding-size', type=int, default=512, metavar='ES',
+parser.add_argument('--embedding-size', type=int, default=256, metavar='ES',
                     help='Dimensionality of the embedding')
 
-parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=128, metavar='BS',
                     help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=64, metavar='BST',
                     help='input batch size for testing (default: 64)')
@@ -67,10 +62,6 @@ parser.add_argument('--wd', default=0.0, type=float,
 parser.add_argument('--optimizer', default='adagrad', type=str,
                     metavar='OPT', help='The optimizer to use (default: Adagrad)')
 # Device options
-parser.add_argument('--no-cuda', action='store_true', default=False,
-                    help='enables CUDA training')
-parser.add_argument('--gpu-id', default='3', type=str,
-                    help='id(s) for CUDA_VISIBLE_DEVICES')
 parser.add_argument('--seed', type=int, default=0, metavar='S',
                     help='random seed (default: 0)')
 parser.add_argument('--log-interval', type=int, default=1, metavar='LI',
@@ -83,11 +74,7 @@ parser.add_argument('--makemfb', action='store_true', default=False,
 
 args = parser.parse_args()
 
-# set the device to use by setting CUDA_VISIBLE_DEVICES env variable in
-# order to prevent any memory allocation on unused GPUs
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
-
-args.cuda = not args.no_cuda and torch.cuda.is_available()
+args.cuda = torch.cuda.is_available()
 np.random.seed(args.seed)
 
 if not os.path.exists(args.log_dir):

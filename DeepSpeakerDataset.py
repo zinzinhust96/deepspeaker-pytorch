@@ -78,7 +78,7 @@ class DeepSpeakerDataset(data.Dataset):
             for file in files:
                 tup = (file, index)
                 features.append(tup)
-
+        
         self.root = dir
         #self.features = features
         self.classes = classes
