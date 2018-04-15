@@ -2,41 +2,26 @@ from __future__ import print_function
 
 
 import numpy as np
-
 import torch.utils.data as data
-
 import os
 
-path = os.path.dirname(os.path.abspath(__file__)) + '/data/BKRecording'
-
-def get_wav_files(path):
-    people = []
+def create_indices(_path):
+    """Returns 2 items: 1 dict contains the arrays of path to the wav files for each person,
+    and 1 array of class names
+    """
+    indices = {}
     classes = []
-    for folder in os.listdir(path):
-        classes.append(folder)
-        f = []
-        for root, dirs, files in os.walk(path):
+    for label in os.listdir(_path):
+        classes.append(label)
+    class_to_idx = {classes[i]: i for i in range(len(classes))}
+    for label in os.listdir(_path):
+        indices[class_to_idx[label]] = []
+        for root, dirs, files in os.walk(_path):
             for file in files:
                 if file.endswith(".wav"):
-                    if (folder in os.path.join(root, file)):
-                        f.append(os.path.join(root, file))
-        people.append(f)
-    return people, classes
-
-
-def find_classes(voxceleb):
-    classes = list(set([datum['speaker_id'] for datum in voxceleb]))
-    classes.sort()
-    class_to_idx = {classes[i]: i for i in range(len(classes))}
-    return classes, class_to_idx
-
-def create_indices(_features):
-    inds = dict()
-    for idx, (feature_path,label) in enumerate(_features):
-        if label not in inds:
-            inds[label] = []
-        inds[label].append(feature_path)
-    return inds
+                    if (label in os.path.join(root, file)):
+                        indices[class_to_idx[label]].append(os.path.join(root, file))
+    return indices, classes
 
 
 def generate_triplets_call(indices,n_classes):
@@ -72,12 +57,7 @@ class DeepSpeakerDataset(data.Dataset):
 
     def __init__(self, path, n_triplets,loader, transform=None, *arg, **kw):
 
-        people, classes = get_wav_files(path)
-        features = []
-        for index, files in enumerate(people):
-            for file in files:
-                tup = (file, index)
-                features.append(tup)
+        indices, classes = create_indices(path)
         
         self.root = dir
         #self.features = features
@@ -89,7 +69,7 @@ class DeepSpeakerDataset(data.Dataset):
         self.n_triplets = n_triplets
 
         #print('Generating {} triplets'.format(self.n_triplets))
-        self.indices = create_indices(features)
+        self.indices = indices
 
 
 
