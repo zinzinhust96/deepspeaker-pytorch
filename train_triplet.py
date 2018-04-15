@@ -18,9 +18,9 @@ from logger import Logger
 
 from DeepSpeakerDataset import DeepSpeakerDataset
 
-from model import PairwiseDistance,TripletMarginLoss
+from model import TripletMarginLoss
 from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncatedinputfromMFB,read_MFB,read_audio,mk_MFB
-
+from utils import PairwiseDistance,display_triplet_distance
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Speaker Recognition')
 # Model options
@@ -46,15 +46,17 @@ parser.add_argument('--test-batch-size', type=int, default=64, metavar='BST',
 parser.add_argument('--test-input-per-file', type=int, default=8, metavar='IPFT',
                     help='input sample per file for testing (default: 8)')
 
-#parser.add_argument('--n-triplets', type=int, default=1000000, metavar='N',
 parser.add_argument('--n-triplets', type=int, default=1000000, metavar='N',
                     help='how many triplets will generate from the dataset')
 
 parser.add_argument('--margin', type=float, default=0.1, metavar='MARGIN',
-                    help='the margin value for the triplet loss function (default: 1.0')
+                    help='the margin value for the triplet loss function (default: 0.1')
+
+parser.add_argument('--min-softmax-epoch', type=int, default=2, metavar='MINEPOCH',
+                    help='minimum epoch for initial parameter using softmax (default: 2')       # for softmax pre training
 
 parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
-                    help='learning rate (default: 0.125)')
+                    help='learning rate (default: 0.1)')
 parser.add_argument('--lr-decay', default=1e-4, type=float, metavar='LRD',
                     help='learning rate decay ratio (default: 1e-4')
 parser.add_argument('--wd', default=0.0, type=float,
@@ -67,7 +69,7 @@ parser.add_argument('--seed', type=int, default=0, metavar='S',
 parser.add_argument('--log-interval', type=int, default=1, metavar='LI',
                     help='how many batches to wait before logging training status')
 
-parser.add_argument('--mfb', action='store_true', default=True,
+parser.add_argument('--mfb', action='store_true', default=False,
                     help='start from MFB file')
 parser.add_argument('--makemfb', action='store_true', default=False,
                     help='need to make mfb file')
@@ -75,7 +77,7 @@ parser.add_argument('--makemfb', action='store_true', default=False,
 args = parser.parse_args()
 
 args.cuda = torch.cuda.is_available()
-np.random.seed(args.seed)
+np.random.seed(args.seed)       #the same set of random number is used (if args.seed is set)
 
 if not os.path.exists(args.log_dir):
     os.makedirs(args.log_dir)
@@ -83,6 +85,7 @@ if not os.path.exists(args.log_dir):
 if args.cuda:
     cudnn.benchmark = True
 
+# log directory
 LOG_DIR = args.log_dir + '/run-optim_{}-n{}-lr{}-wd{}-m{}-embeddings{}-msceleb-alpha10'\
     .format(args.optimizer, args.n_triplets, args.lr, args.wd,
             args.margin,args.embedding_size)
@@ -91,18 +94,36 @@ LOG_DIR = args.log_dir + '/run-optim_{}-n{}-lr{}-wd{}-m{}-embeddings{}-msceleb-a
 logger = Logger(LOG_DIR)
 
 
-
-
 kwargs = {'num_workers': 0, 'pin_memory': True} if args.cuda else {}
+# num_workers (int, optional) – how many subprocesses to use for data loading. 0 means that the data will be loaded in the main process. (default: 0)
+# pin_memory (bool, optional) – If True, the data loader will copy tensors into CUDA pinned memory before returning them.
+
 l2_dist = PairwiseDistance(2)
 
-transform = transforms.Compose([
-                    truncatedinput(),
-                    toMFB(),
-                    totensor(),
-                    #tonormal()
-                ])
-file_loader = read_audio
+if args.makemfb:
+    #pbar = tqdm(voxceleb)
+    for datum in voxceleb:
+        mk_MFB((args.dataroot +'/voxceleb1_wav/' + datum['filename']+'.wav'))
+    print("Complete convert")
+
+if args.mfb:
+    transform = transforms.Compose([
+        truncatedinputfromMFB(),
+        totensor()
+    ])
+    transform_T = transforms.Compose([
+        truncatedinputfromMFB(input_per_file=args.test_input_per_file),
+        totensor()
+    ])
+    file_loader = read_MFB
+else:
+    transform = transforms.Compose([
+                        truncatedinput(),
+                        toMFB(),
+                        totensor(),
+                        #tonormal()
+                    ])
+    file_loader = read_audio
 
 
 train_dir = DeepSpeakerDataset(path = os.path.dirname(os.path.abspath(__file__)) + '/data/BKRecording',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
@@ -151,6 +172,9 @@ def main():
         train(train_loader, model, optimizer, epoch)
         #test(test_loader, model, epoch)
         #break;
+
+        if test_display_triplet_distance:
+            display_triplet_distance(model,train_loader,LOG_DIR+"/train_{}".format(epoch))
 
 
 def train(train_loader, model, optimizer, epoch):

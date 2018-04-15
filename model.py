@@ -5,18 +5,6 @@ import math
 
 from torch.autograd import Function
 
-class PairwiseDistance(Function):
-    def __init__(self, p):
-        super(PairwiseDistance, self).__init__()
-        self.norm = p
-
-    def forward(self, x1, x2):
-        assert x1.size() == x2.size()
-        eps = 1e-4 / x1.size(1)
-        diff = torch.abs(x1 - x2)
-        out = torch.pow(diff, self.norm).sum(dim=1)
-        return torch.pow(out + eps, 1. / self.norm)
-
 class TripletMarginLoss(Function):
     """Triplet loss function.
     """
@@ -179,7 +167,7 @@ class DeepSpeakerModel(nn.Module):
 
     def forward(self, x):
 
-        print('Input: ', x.shape)
+        print('\nInput: ', x.shape)
 
         x = self.model.conv1(x)
         x = self.model.bn1(x)
@@ -210,6 +198,8 @@ class DeepSpeakerModel(nn.Module):
         # affine
         x = x.view(x.size(0), -1)
         x = self.model.fc(x)
+
+        print('After affine: ', x.shape)
 
         #length normalization
         self.features = self.l2_norm(x)
