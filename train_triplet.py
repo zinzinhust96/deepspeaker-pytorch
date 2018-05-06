@@ -126,7 +126,7 @@ else:
     file_loader = read_audio
 
 
-train_dir = DeepSpeakerDataset(path = os.path.dirname(os.path.abspath(__file__)) + '/data/BKRecording',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
+train_dir = DeepSpeakerDataset(path = os.path.dirname(os.path.abspath(__file__)) + '/data/train_set',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
 
 #test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
 

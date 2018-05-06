@@ -20,4 +20,6 @@ cnnModel = DeepSpeakerModel(256, 1)
 
 input = Variable(torch.randn(128, 1, 64, 32).type(torch.FloatTensor), requires_grad=True)
 
-output = cnnModel.forward_classifier(input)
+output = cnnModel(input)
+
+print('OUTPUT: ', output)
