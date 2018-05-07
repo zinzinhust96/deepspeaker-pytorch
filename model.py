@@ -167,39 +167,27 @@ class DeepSpeakerModel(nn.Module):
 
     def forward(self, x):
 
-        print('\nInput: ', x.shape)
-
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
         x = self.model.layer1(x)
-
-        print('After layer 1: ', x.shape)
 
         x = self.model.conv2(x)
         x = self.model.bn2(x)
         x = self.model.relu(x)
         x = self.model.layer2(x)
 
-        print('After layer 2: ', x.shape)
-
         x = self.model.conv3(x)
         x = self.model.bn3(x)
         x = self.model.relu(x)
         x = self.model.layer3(x)
 
-        print('After layer 3: ', x.shape)
-
         # average sentence
         x = self.model.avgpool(x)
-
-        print('After avgpool: ', x.shape)
 
         # affine
         x = x.view(x.size(0), -1)
         x = self.model.fc(x)
-
-        print('After affine: ', x.shape)
 
         #length normalization
         self.features = self.l2_norm(x)

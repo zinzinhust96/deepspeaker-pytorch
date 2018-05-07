@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from model import DeepSpeakerModel
 from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncatedinputfromMFB,read_MFB,read_audio,mk_MFB
 from utils import PairwiseDistance
+from files import readEnrollmentPaths, readTestPaths
 
 file_transform = transforms.Compose([
                 truncatedinput(),
@@ -20,23 +21,8 @@ file_loader = read_audio
 
 l2_dist = PairwiseDistance(2)
 
-def create_indices(_path):
-    """Returns 2 items: 1 dict contains the arrays of path to the wav files for each person,
-    and 1 array of class names
-    """
-    indices = {}
-    classes = []
-    for label in os.listdir(_path):
-        classes.append(label)
-    class_to_idx = {classes[i]: i for i in range(len(classes))}
-    for label in os.listdir(_path):
-        indices[class_to_idx[label]] = []
-        for root, dirs, files in os.walk(_path):
-            for file in files:
-                if file.endswith(".wav"):
-                    if (label in os.path.join(root, file)):
-                        indices[class_to_idx[label]].append(os.path.join(root, file))
-    return indices, classes
+model = DeepSpeakerModel(embedding_size=256,
+                      num_classes=3)
 
 def transform(feature_path):
     """Convert image into numpy array and apply transformation
@@ -45,17 +31,20 @@ def transform(feature_path):
     feature = file_loader(feature_path)
     return file_transform(feature)
 
+def calculateOneEmbedding(path):
+    feature = transform(path)
+    feature = Variable(feature.unsqueeze(0))  
+    return model(feature)
+
 def enrollment(model):
-    indices, classes = create_indices(os.path.dirname(os.path.abspath(__file__)) + '/data/enrollment_set')
+    indices, classes = readEnrollmentPaths(os.path.dirname(os.path.abspath(__file__)) + '/data/test_data')
 
     embeddings = {}
     for key, value in indices.items():
         embeddings[key] = Variable(torch.FloatTensor(1, 256).zero_())
         numberOfUtterance = len(value)
         for path in value:
-            feature = transform(path)
-            feature = Variable(feature.unsqueeze(0))  
-            out = model(feature)
+            out = calculateOneEmbedding(path)
             embeddings[key] += out
         embeddings[key] /= numberOfUtterance
 
@@ -64,14 +53,12 @@ def enrollment(model):
 def test(model, embeddings):
     labels, results = [], []
     
-    indices, classes = create_indices(os.path.dirname(os.path.abspath(__file__)) + '/data/test_set')
+    indices, classes = readTestPaths(os.path.dirname(os.path.abspath(__file__)) + '/data/test_data')
 
     for key, value in indices.items():
         for path in value:
             labels.append(key)            
-            feature = transform(path)
-            feature = Variable(feature.unsqueeze(0))  
-            out = model(feature)
+            out = calculateOneEmbedding(path)
             distances = []            
             for key_e, value_e in embeddings.items():
                 dists = l2_dist.forward(out,value_e)#torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
@@ -92,13 +79,8 @@ def test(model, embeddings):
 
 
 def main():
-    model = DeepSpeakerModel(embedding_size=256,
-                      num_classes=3)
-    
     embeddings = enrollment(model)
     test(model, embeddings)
-
-
 
 
 if __name__ == '__main__':
