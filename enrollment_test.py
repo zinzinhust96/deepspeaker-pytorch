@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import argparse
 import torch
 import numpy as np
 import torch.utils.data as data
@@ -11,6 +12,14 @@ from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncate
 from utils import PairwiseDistance
 from files import readEnrollmentPaths, readTestPaths
 
+parser = argparse.ArgumentParser(description='PyTorch Speaker Recognition Enrollment and Test')
+parser.add_argument('--resume',
+                    default=None,
+                    type=str, metavar='PATH',
+                    help='path to latest checkpoint (default: none)')
+
+args = parser.parse_args()
+
 file_transform = transforms.Compose([
                 truncatedinput(),
                 toMFB(),
@@ -21,9 +30,6 @@ file_loader = read_audio
 
 l2_dist = PairwiseDistance(2)
 
-model = DeepSpeakerModel(embedding_size=256,
-                      num_classes=3)
-
 def transform(feature_path):
     """Convert image into numpy array and apply transformation
         Doing this so that it is consistent with all other datasets
@@ -31,7 +37,7 @@ def transform(feature_path):
     feature = file_loader(feature_path)
     return file_transform(feature)
 
-def calculateOneEmbedding(path):
+def calculateOneEmbedding(path, model):
     feature = transform(path)
     feature = Variable(feature.unsqueeze(0))  
     return model(feature)
@@ -44,7 +50,7 @@ def enrollment(model):
         embeddings[key] = Variable(torch.FloatTensor(1, 256).zero_())
         numberOfUtterance = len(value)
         for path in value:
-            out = calculateOneEmbedding(path)
+            out = calculateOneEmbedding(path, model)
             embeddings[key] += out
         embeddings[key] /= numberOfUtterance
 
@@ -58,7 +64,7 @@ def test(model, embeddings):
     for key, value in indices.items():
         for path in value:
             labels.append(key)            
-            out = calculateOneEmbedding(path)
+            out = calculateOneEmbedding(path, model)
             distances = []            
             for key_e, value_e in embeddings.items():
                 dists = l2_dist.forward(out,value_e)#torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
@@ -79,6 +85,18 @@ def test(model, embeddings):
 
 
 def main():
+
+    model = DeepSpeakerModel(embedding_size=256,
+                      num_classes=10)
+
+    if args.resume:
+        if os.path.isfile(args.resume):
+            print('=> loading checkpoint {}'.format(args.resume))
+            checkpoint = torch.load(args.resume)
+            model.load_state_dict(checkpoint['state_dict'])
+        else:
+            print('=> no checkpoint found at {}'.format(args.resume))
+
     embeddings = enrollment(model)
     test(model, embeddings)
 

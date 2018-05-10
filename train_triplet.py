@@ -33,20 +33,20 @@ parser.add_argument('--resume',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('--start-epoch', default=1, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('--epochs', type=int, default=50, metavar='E',
+parser.add_argument('--epochs', type=int, default=3, metavar='E',
                     help='number of epochs to train (default: 10)')
 # Training options
 parser.add_argument('--embedding-size', type=int, default=256, metavar='ES',
                     help='Dimensionality of the embedding')
 
-parser.add_argument('--batch-size', type=int, default=128, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=64, metavar='BST',
                     help='input batch size for testing (default: 64)')
 parser.add_argument('--test-input-per-file', type=int, default=8, metavar='IPFT',
                     help='input sample per file for testing (default: 8)')
 
-parser.add_argument('--n-triplets', type=int, default=1000000, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=10240, metavar='N',
                     help='how many triplets will generate from the dataset')
 
 parser.add_argument('--margin', type=float, default=0.1, metavar='MARGIN',
@@ -126,7 +126,7 @@ else:
     file_loader = read_audio
 
 
-train_dir = DeepSpeakerDataset(path = os.path.dirname(os.path.abspath(__file__)) + '/data/train_data',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
+train_dir = DeepSpeakerDataset(path = '/media/zinzin/CA92B91D92B90F47/BKRecording',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
 
 #test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
 

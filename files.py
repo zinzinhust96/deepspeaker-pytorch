@@ -2,7 +2,7 @@ import os
 
 # _path = os.path.dirname(os.path.abspath(__file__)) + '/data/test_data'
 
-def generateAllAudioPathForEachPerson():
+def generateAllAudioPathForEachPerson(_path):
     for label in os.listdir(_path):
         pathToLabel = _path + '/' + label
         os.chdir(pathToLabel)
@@ -59,7 +59,7 @@ def create_indices(_path):
     return indices, classes
 
 def main():
-    readEnrollmentPaths(os.path.dirname(os.path.abspath(__file__)) + '/data/test_data')
+    generateAllAudioPathForEachPerson(os.path.dirname(os.path.abspath(__file__)) + '/data/test_set')
     print('\n')
     # create_indices('/home/zinzin/Documents/pytorch/deepspeaker-pytorch/data/enrollment_set')
 
