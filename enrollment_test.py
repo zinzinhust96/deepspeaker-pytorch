@@ -12,6 +12,8 @@ from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncate
 from utils import PairwiseDistance
 from files import readEnrollmentPaths, readTestPaths
 
+_path = os.path.dirname(os.path.abspath(__file__)) + '/data/test_data'
+
 parser = argparse.ArgumentParser(description='PyTorch Speaker Recognition Enrollment and Test')
 parser.add_argument('--resume',
                     default=None,
@@ -39,11 +41,11 @@ def transform(feature_path):
 
 def calculateOneEmbedding(path, model):
     feature = transform(path)
-    feature = Variable(feature.unsqueeze(0))  
+    feature = Variable(feature.unsqueeze(0))
     return model(feature)
 
 def enrollment(model):
-    indices, classes = readEnrollmentPaths(os.path.dirname(os.path.abspath(__file__)) + '/data/test_data')
+    indices, classes = readEnrollmentPaths(_path)
 
     embeddings = {}
     for key, value in indices.items():
@@ -53,13 +55,15 @@ def enrollment(model):
             out = calculateOneEmbedding(path, model)
             embeddings[key] += out
         embeddings[key] /= numberOfUtterance
+    
+    # print('embeddings: ', embeddings)
 
     return embeddings
 
 def test(model, embeddings):
     labels, results = [], []
     
-    indices, classes = readTestPaths(os.path.dirname(os.path.abspath(__file__)) + '/data/test_data')
+    indices, classes = readTestPaths(_path)
 
     for key, value in indices.items():
         for path in value:
@@ -97,6 +101,8 @@ def main():
         else:
             print('=> no checkpoint found at {}'.format(args.resume))
 
+    # print(calculateOneEmbedding('/home/zinzin/Documents/pytorch/deepspeaker-pytorch/data/test_set/dnl/s1/t1/s1_t1_1.wav', model))
+    
     embeddings = enrollment(model)
     test(model, embeddings)
 
