@@ -107,17 +107,14 @@ def pre_process_inputs(signal=np.random.uniform(size=32000), target_sample_rate=
         frames_features = filter_banks
     num_frames = len(frames_features)
     network_inputs = []
-    """Too complicated
     for j in range(c.NUM_PREVIOUS_FRAME, num_frames - c.NUM_NEXT_FRAME):
         frames_slice = frames_features[j - c.NUM_PREVIOUS_FRAME:j + c.NUM_NEXT_FRAME]
         #network_inputs.append(np.reshape(frames_slice, (32, 20, 3)))
         network_inputs.append(frames_slice)
-        
-    """
-    import random
-    j = random.randrange(c.NUM_PREVIOUS_FRAME, num_frames - c.NUM_NEXT_FRAME)
-    frames_slice = frames_features[j - c.NUM_PREVIOUS_FRAME:j + c.NUM_NEXT_FRAME]
-    network_inputs.append(frames_slice)
+    # import random
+    # j = random.randrange(c.NUM_PREVIOUS_FRAME, num_frames - c.NUM_NEXT_FRAME)
+    # frames_slice = frames_features[j - c.NUM_PREVIOUS_FRAME:j + c.NUM_NEXT_FRAME]
+    # network_inputs.append(frames_slice)
     return np.array(network_inputs)
 
 class truncatedinput(object):
