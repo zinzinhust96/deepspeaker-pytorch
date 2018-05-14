@@ -85,13 +85,13 @@ class BasicBlock(nn.Module):
 
 class myResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000):
+    def __init__(self, block, layers, num_classes=10):
 
         super(myResNet, self).__init__()
 
         self.relu = ReLU(inplace=True)
         self.inplanes = 64
-        self.conv1 = nn.Conv2d(1, 64, kernel_size=5, stride=2, padding=2,bias=False)
+        self.conv1 = nn.Conv2d(15, 64, kernel_size=5, stride=2, padding=2,bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.layer1 = self._make_layer(block, 64, layers[0])
 
