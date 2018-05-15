@@ -61,7 +61,7 @@ parser.add_argument('--lr-decay', default=1e-4, type=float, metavar='LRD',
                     help='learning rate decay ratio (default: 1e-4')
 parser.add_argument('--wd', default=0.0, type=float,
                     metavar='W', help='weight decay (default: 0.0)')
-parser.add_argument('--optimizer', default='adagrad', type=str,
+parser.add_argument('--optimizer', default='adam', type=str,
                     metavar='OPT', help='The optimizer to use (default: Adagrad)')
 # Device options
 parser.add_argument('--seed', type=int, default=0, metavar='S',
