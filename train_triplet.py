@@ -36,7 +36,7 @@ parser.add_argument('--start-epoch', default=1, type=int, metavar='N',
 parser.add_argument('--epochs', type=int, default=3, metavar='E',
                     help='number of epochs to train (default: 10)')
 # Training options
-parser.add_argument('--embedding-size', type=int, default=256, metavar='ES',
+parser.add_argument('--embedding-size', type=int, default=128, metavar='ES',
                     help='Dimensionality of the embedding')
 
 parser.add_argument('--batch-size', type=int, default=512, metavar='BS',

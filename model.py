@@ -159,7 +159,7 @@ class DeepSpeakerModel(nn.Module):
         self.embedding_size = embedding_size
 
         self.model = myResNet(BasicBlock, [3, 3, 3])
-        self.model.fc = nn.Linear(512*2, self.embedding_size)
+        self.model.fc = nn.Linear(512, self.embedding_size)
 
         self.model.classifier = nn.Linear(self.embedding_size, num_classes)
 
@@ -190,11 +190,6 @@ class DeepSpeakerModel(nn.Module):
         x = self.model.bn2(x)
         x = self.model.relu(x)
         x = self.model.layer2(x)
-
-        x = self.model.conv3(x)
-        x = self.model.bn3(x)
-        x = self.model.relu(x)
-        x = self.model.layer3(x)
 
         # average sentence
         x = self.model.avgpool(x)

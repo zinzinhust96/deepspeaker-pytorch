@@ -90,7 +90,7 @@ def test(model, embeddings):
 
 def main():
 
-    model = DeepSpeakerModel(embedding_size=256,
+    model = DeepSpeakerModel(embedding_size=128,
                       num_classes=10)
 
     if args.resume:
@@ -101,7 +101,7 @@ def main():
         else:
             print('=> no checkpoint found at {}'.format(args.resume))
 
-    # print(calculateOneEmbedding('/home/zinzin/Documents/pytorch/deepspeaker-pytorch/data/test_set/dnl/s1/t1/s1_t1_1.wav', model))
+    # print('fasfasfas: ', calculateOneEmbedding('/home/zinzinhust96/pytorch/deepspeaker-pytorch/data/data/test_set/dnl/s1/t1/s1_t1_1.wav', model))
     
     embeddings = enrollment(model)
     test(model, embeddings)
