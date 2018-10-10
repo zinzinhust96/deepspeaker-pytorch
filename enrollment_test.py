@@ -11,8 +11,9 @@ from model import DeepSpeakerModel
 from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncatedinputfromMFB,read_MFB,read_audio,mk_MFB
 from utils import PairwiseDistance
 from files import readEnrollmentPaths, readTestPaths
+from constants import TEST_DIR
 
-_path = os.path.dirname(os.path.abspath(__file__)) + '/data/test_data'
+_path = TEST_DIR
 
 parser = argparse.ArgumentParser(description='PyTorch Speaker Recognition Enrollment and Test')
 parser.add_argument('--resume',

@@ -1,7 +1,6 @@
-DATASET_DIR = './voxceleb'
+DATASET_DIR = './waves'
+TEST_DIR = './data/test_set'
 AUDIO_DIR = './voxceleb/voxceleb1_wav'
-
-
 
 NUM_PREVIOUS_FRAME = 20
 #NUM_PREVIOUS_FRAME = 13

@@ -21,6 +21,7 @@ from DeepSpeakerDataset import DeepSpeakerDataset
 from model import TripletMarginLoss
 from audio_processing import toMFB, totensor, truncatedinput, tonormal, truncatedinputfromMFB,read_MFB,read_audio,mk_MFB
 from utils import PairwiseDistance,display_triplet_distance
+from constants import DATASET_DIR
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Speaker Recognition')
 # Model options
@@ -126,7 +127,7 @@ else:
     file_loader = read_audio
 
 
-train_dir = DeepSpeakerDataset(path = '/media/windows/BKRecording',n_triplets=args.n_triplets,loader = file_loader,transform=transform)
+train_dir = DeepSpeakerDataset(path = DATASET_DIR,n_triplets=args.n_triplets,loader = file_loader,transform=transform)
 
 #test_dir = VoxcelebTestset(dir=args.dataroot,pairs_path=args.test_pairs_path,loader = file_loader, transform=transform_T)
 
